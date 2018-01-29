@@ -1,8 +1,8 @@
 import data
 from flask import Flask, render_template, flash,redirect, url_for, session, logging
 from flask_mysqldb import MySQL 
-from wtforms import Form,StringField, TextAreaFiled, PasswordField, validators
-from passlib.has import sha256_crypt
+from wtforms import Form,StringField, TextAreaField, PasswordField, validators
+from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ app.debug=True
 
 @app.route("/")
 def index():
-    return render_template("products_search.html", products = data.getProducts())
+    return render_template("products_search.html")
 
 class RegistrationForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
@@ -28,9 +28,10 @@ def register():
     if request.method == 'POST' and form.validate():
 
         return render_template('register.hmtl', form=form) 
-        
-    
 
+@app.route('/products')
+def products():
+    return render_template("products.html", products = data.getProducts())
 
 
 if __name__ == "__main__":
