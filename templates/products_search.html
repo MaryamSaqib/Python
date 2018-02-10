@@ -1,1 +1,13 @@
-<h1>Home page</h1>
+{% extends 'includes/_layout.html' %}
+
+{% block body %}
+<div class="jumbotron">
+    <h1 class="display-3">Supermarket Offer Control</h1>
+    <p class="lead">Change this text.</p>
+    <hr class="my-4">
+    <p>Click below to register</p>
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="/register" role="button">register</a>
+    </p>
+  </div>
+{% endblock %}

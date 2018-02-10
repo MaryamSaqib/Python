@@ -1,5 +1,10 @@
-<h1>Products</h1>
-{% for product in products %}
-    <p>{{ product.name }}, {{ product.price }}</p>
-{% endfor %}
+{% extends 'includes/_layout.html' %}
+
+{% block body %}
+    <h1>Products</h1>
+    {% for product in products %}
+        <p>{{ product.name }}, {{ product.price }}</p>
+    {% endfor %}
+
+{% endblock %}
 
