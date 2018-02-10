@@ -61,9 +61,48 @@ def register():
 
     return render_template('register.html', form=form) 
 
+#user login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    
+    if request.method == 'POST':
+        # Get form fields
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get user by username
+        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+
+        if result > 0:
+            # Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+
+            # Compare passwords 
+            if sha256_crypt.verify(password_candidate, password):
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for('products'))
+            else:
+                error = 'Invalid password'
+                return render_template('login.html', error = error)
+                #might need to close the connection here
+        else:
+            app.logger.info('NO USER')
+    else:
+        error = 'Username not found'
+        return render_template('login.html')
+
+
+
 @app.route('/products')
 def products():
-    return render_template("products.html", products = data.getProducts())
+    return render_template("products.html", productslist = data.getProducts())
 
 
 if __name__ == "__main__":
