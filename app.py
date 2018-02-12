@@ -91,12 +91,31 @@ def login():
             else:
                 error = 'Invalid password'
                 return render_template('login.html', error = error)
-                #might need to close the connection here
+            # Close connection 
+            cur.close() 
         else:
             app.logger.info('NO USER')
     else:
         error = 'Username not found'
         return render_template('login.html')
+
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, please log in', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('login'))
 
 
 
