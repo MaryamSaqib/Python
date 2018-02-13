@@ -119,9 +119,12 @@ def logout():
 
 
 
-@app.route('/products')
+@app.route('/products', methods=['GET', 'POST'])
 def products():
-    return render_template("products.html", productslist = data.getProducts())
+    if request.method=='POST':
+        return render_template("products.html", productslist = data.getProducts(request.form['inputProduct'])) 
+    else:
+        return render_template("products.html")
 
 
 if __name__ == "__main__":

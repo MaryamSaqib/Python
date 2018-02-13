@@ -27,6 +27,27 @@
     </form>
 
     {% if productslist %}
+<table id='listProducts' class='table'>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Image</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in productslist %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>£{{ product.price }}</td>
+            <td><img src="{{ product.image }}" alt="{{ product.name }}"></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+    {% if productslist %}
         <h1>Products</h1>
         {% for product in products %}
             <p>{{ product.name }}, {{ product.price }}</p>
