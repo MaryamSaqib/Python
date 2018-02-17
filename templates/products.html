@@ -27,12 +27,13 @@
     </form>
 
     {% if productslist %}
-<table id='listProducts' class='table'>
+<table id='listProducts' class='table' label='button'>
     <thead>
         <tr>
             <th>Name</th>
             <th>Price</th>
             <th>Image</th>
+            <th>Subscribe / Unsubscribe</th>
         </tr>
     </thead>
     <tbody>
@@ -41,6 +42,7 @@
             <td>{{ product.name }}</td>
             <td>£{{ product.price }}</td>
             <td><img src="{{ product.image }}" alt="{{ product.name }}"></td>
+            <td></td>
         </tr>
         {% endfor %}
     </tbody>
