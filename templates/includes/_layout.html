@@ -18,8 +18,46 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function(){
-            $('#listProducts').DataTable();
+        $(document).ready(function() {
+            var table = $('#listProducts').DataTable({
+                //"ajax": "data/arrays.txt",
+                "columnDefs": [ {
+                "targets": -1,
+                "data": null,
+                //"defaultContent": "<button class='btn btn-success'>Subscribe</button>"
+                "render": function(data, type, full, meta){
+                    if(type === 'display' && full[1] == 'Yes'){
+                        data = '<button class=\'btn btn-danger\'>Unsubscribe</button>';
+                    } else {
+                        data = '<button class=\'btn btn-success\'>Subscribe</button>';
+                    }
+                    return data;
+                 } 
+                } ]
+            });
+            
+        $('#listProducts tbody').on( 'click', 'button', function () {
+            var rowData = table.row( $(this).parents('tr') ).data();
+            $.ajax({
+                data: {
+                    id: rowData[0],
+                    search: rowData[1],
+                    subscribed: rowData[2],
+                    name: rowData[3],
+                    price: rowData[4],
+                    image: rowData[5]
+                },
+                type: 'POST',
+                url: '/subscribe',
+                success: function(response) {
+                    //$("#productName").text(rowData[3])
+                    //$("#subscribeModal").modal('show');
+                    //table.fnReloadAjax();
+                    location.reload();
+                    //table.ajax.url( 'static/data.json' ).load();
+                }
+            });
         });
+    });
     </script>
 </html> 

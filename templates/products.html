@@ -2,6 +2,13 @@
 
 {% block body %}
 
+    {% if productslist %}
+        <h1>Products</h1>
+        {% for product in products %}
+            <p>{{ product.name }}, {{ product.price }}</p>
+        {% endfor %}
+    {% endif %}
+
     <form class="form-horizontal" method="post" action="/products">
         <fieldset>
 
@@ -49,12 +56,6 @@
 </table>
 {% endif %}
 
-    {% if productslist %}
-        <h1>Products</h1>
-        {% for product in products %}
-            <p>{{ product.name }}, {{ product.price }}</p>
-        {% endfor %}
-    {% endif %}
 
 {% endblock %}
 
