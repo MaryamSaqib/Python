@@ -3,7 +3,7 @@ from flask import Flask, render_template, flash,redirect, url_for, session, requ
 from flask_mysqldb import MySQL 
 from wtforms import Form,StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
-
+from functools import wraps
 app = Flask(__name__)
 
 # config MYSQL 
@@ -99,7 +99,7 @@ def login():
         error = 'Username not found'
         return render_template('login.html')
 
-# Check if user logged in
+# Check if user logged in - we need this to prevent users from navigating to the page withpout being logged in
 def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -125,6 +125,39 @@ def products():
         return render_template("products.html", productslist = data.getProducts(request.form['inputProduct'])) 
     else:
         return render_template("products.html")
+
+@app.route('/subscribe', methods=['GET','POST']) 
+@is_logged_in
+def subscribe():
+    if request.method == 'POST':
+        print 'Woohoo - Request is ' + request.form['name'] + ' ' +  request.form['price'][1:] + ' with an id of ' + request.form['id']
+        productName = request.form['name']
+        productPrice = request.form['price'][1:]
+        productId = request.form['id']
+        productImage = request.form['image']
+
+        #Get id for user account
+        cur = mysql.connection.cursor()
+
+        # execute query
+        cur.execute("select * from users where username = '%s'" % session['username']) 
+
+        result = cur.fetchone()
+        if result > 0:
+            userId = result['id']
+            #Add subscription
+            cur.execute("insert into subscriptions (productid, productname, productprice, productimage, userid) values (%s, %s, %s, %s, %s)", (productId, productName, productPrice, productImage, userId))
+            # commit to database 
+            mysql.connection.commit()
+        else:
+            print 'Could not get user id'
+    else:
+        print 'Method is not a post'
+        # close connection 
+        cur.close() 
+    #redo the search here to refresh data
+    #maindata.getProducts(productSearch)
+    return render_template('products.html') 
 
 
 if __name__ == "__main__":
