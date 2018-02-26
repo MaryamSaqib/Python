@@ -44,9 +44,10 @@
             $.ajax({
                 data: {
                     id: rowData[0],
-                    name: rowData[1],
-                    price: rowData[2],
-                    image: rowData[3]
+                    subscribed: rowData[1],
+                    name: rowData[2],
+                    price: rowData[3],
+                    image: rowData[4]
                 },
                 type: 'POST',
                 url: '/subscribe',

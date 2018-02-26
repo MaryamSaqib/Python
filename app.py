@@ -20,6 +20,18 @@ mysql = MySQL(app)
 
 app.debug=True
 
+# custom function to check if the logged in user has any existing suscriptions 
+def isProductSubscribed(userid, productid):
+    cur = mysql.connection.cursor()
+    print('in product subscribed')
+    # Get user by username
+    subscriptions = cur.execute("select * from subscriptions where userid = '%s' and productid ='%s'" % (userid, productid)) 
+
+    if subscriptions > 0:
+        return True
+    else:
+        return False
+
 @app.route("/")
 def index():
     return render_template("products_search.html")
@@ -122,9 +134,32 @@ def logout():
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     if request.method=='POST':
-        return render_template("products.html", productslist = data.getProducts(request.form['inputProduct'])) 
+        #handle userid
+        cur = mysql.connection.cursor() 
+        result = cur.execute("select * from users where username = '%s'" % session['username']) # use the username from session and get the user id 
+        result = cur.fetchone()
+        if result > 0:
+            userid = result['id']
+        else:
+            print 'No user'
+
+        originalData = data.getProducts(request.form['inputProduct'])
+        amendedData = []
+
+        for sdata in originalData:
+            isSubscribed = isProductSubscribed(userid, sdata['id']) 
+            if isSubscribed:
+                sdata['subscribed'] = 'Yes' #adding subscription staus to the data
+            else:
+                sdata['subscribed'] = 'No'
+            
+            amendedData.append(sdata) 
+            print(amendedData)
+        return render_template("products.html", productslist = amendedData) 
     else:
-        return render_template("products.html")
+        return render_template("products.html") 
+
+
 
 @app.route('/subscribe', methods=['GET','POST']) 
 @is_logged_in
