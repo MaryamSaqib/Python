@@ -23,7 +23,6 @@ app.debug=True
 # custom function to check if the logged in user has any existing suscriptions 
 def isProductSubscribed(userid, productid):
     cur = mysql.connection.cursor()
-    print('in product subscribed')
     # Get user by username
     subscriptions = cur.execute("select * from subscriptions where userid = '%s' and productid ='%s'" % (userid, productid)) 
 
@@ -154,7 +153,6 @@ def products():
                 sdata['subscribed'] = 'No'
             
             amendedData.append(sdata) 
-            print(amendedData)
         return render_template("products.html", productslist = amendedData) 
     else:
         return render_template("products.html") 
@@ -165,11 +163,12 @@ def products():
 @is_logged_in
 def subscribe():
     if request.method == 'POST':
-        print 'Woohoo - Request is ' + request.form['name'] + ' ' +  request.form['price'][1:] + ' with an id of ' + request.form['id']
         productName = request.form['name']
         productPrice = request.form['price'][1:]
         productId = request.form['id']
         productImage = request.form['image']
+        isProductSubscribed = request.form['subscribed']
+
 
         #Get id for user account
         cur = mysql.connection.cursor()
@@ -180,10 +179,16 @@ def subscribe():
         result = cur.fetchone()
         if result > 0:
             userId = result['id']
-            #Add subscription
-            cur.execute("insert into subscriptions (productid, productname, productprice, productimage, userid) values (%s, %s, %s, %s, %s)", (productId, productName, productPrice, productImage, userId))
-            # commit to database 
-            mysql.connection.commit()
+            if isProductSubscribed == 'No':
+                #Add subscription
+                cur.execute("insert into subscriptions (productid, productname, productprice, productimage, userid) values (%s, %s, %s, %s, %s)", (productId, productName, productPrice, productImage, userId))
+                # commit to database 
+                mysql.connection.commit()
+            elif isProductSubscribed == 'Yes':
+                #Remove subscription
+                cur.execute("delete from subscriptions where userid = '%s' and productid = %s", (userId, productId))
+                # commit to database 
+                mysql.connection.commit()
         else:
             print 'Could not get user id'
     else:
